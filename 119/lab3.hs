@@ -17,7 +17,30 @@ test_re = reparse "(a(b(aa)*b)*(a+b(aa)*ab)+b(a(bb)*a)*(b+a)(bb)*ba)*"
 -- finding all possible "splits" for a concatenation and then trying the 
 -- match against each one. The function `splits` is defined for you (below)
 match_correct :: Matcher
-match_correct r s = undefined
+
+--match_correct Empty s = null
+--match_correct (Letter c) s = undefined
+match_correct r s = case match r s of
+                      Just "" -> True
+                      Nothing ->False
+
+  where
+    match :: RE -> String -> Maybe String
+    match Empty "" = (Just "")
+    match (Letter a) (s:ss) = if (a == s)
+                          then (Just "")
+                          else (Nothing)
+    match (Cat r1 r2) s = if and [((match_correct r1 s1) && (match_correct r2 s2)) | (s1,s2) <- (splits s)]
+                          then (Just "")
+                          else (Nothing)
+
+    match (Union r1 r2) s = if or[((match r1 s1 == Just "") || (match r2 s2 == Just "")) | (s1,s2) <- (splits s)]
+                            then (Just "")
+                            else (Nothing)
+    match (Star r) s = undefined
+    match _ _ = Nothing
+  --  match r s = undefined
+
 
 
 -- Problem 2: Choose one of the other four matching algorithms:
