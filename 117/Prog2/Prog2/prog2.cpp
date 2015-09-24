@@ -13,7 +13,7 @@
 
 using namespace std;
 // here are the function prototypes that we need expression, terminal, and factor
-int Exp(), Term(), Exp2(int), Term2(int), Fact();
+int Exp(), Term(), Exp2(int), Term2(int), Fact(), Pwr();
 
 // This declaration is for when we want to get data from the data file where our example operation is
 ifstream fin("myfile.txt");
@@ -30,6 +30,7 @@ int main(){
 	fin.close();
 
 
+	/*
 	fin.open ("myfile2.txt");	
 	// this is checking if the file opened or not in case that it did not open it will give a message 
 	// 
@@ -46,6 +47,8 @@ int main(){
 	else cout << "could not open file" <<endl;
 
 	fin.close();
+	*/
+	
 
 
 return(0);
@@ -59,7 +62,7 @@ int Exp(){
 // this is the recursive (T') from T--> FT'
 int Term(){
 
-	return (Term2(Fact()) );
+	return (Term2(Pwr()) );
 }
 // this is already inside the loop E'--> +TE'|-TE'| e
 int Exp2(int input){
@@ -73,6 +76,8 @@ int Exp2(int input){
 			result = Exp2(result + Term() );
 		else if(a == '-')
 			result = Exp2(result - Term() );
+		else if(a == ')')
+			fin.putback(a);
 	}
 	return result;
 }
@@ -86,15 +91,32 @@ int Term2(int input){
 	if (!fin.eof() ){
 		fin.get(a);
 		if (a == '*')
-			result = Term2(result * Fact() );
+			result = Term2(result * Pwr() );
 		else if (a == '/')
-			result = Term2(result / Fact() );
-		else if (a == '^')
-			result = Term2(pow(result,Term())); // based on presedence the '^' symbol has to be here because it has higher precedence than the other operations so it goes in the bottom.
+			result = Term2(result / Pwr() );
 		else if (a == '+' || a == '-' || a == ')') // i added the ')' to close the parenthesis . it does this because when it finds it a gets put back so it knows what operation to do 
 			fin.putback(a);
 	}
 	return result;
+}
+
+int Pwr(){
+
+	int p = Fact();
+	char a;
+
+	if (!fin.eof() ){
+		fin.get(a);
+
+		if (a == '^')
+			p = pow(p, Pwr());
+		if (a == '+' || a == '-' || a == '*' || a == '/' || a == ')')
+			fin.putback(a);
+
+	}
+
+	return p;
+
 }
 
 int Fact(){
@@ -104,7 +126,10 @@ int Fact(){
 	// in this part it just tells the program that when the program sees '(' this jump back to the top to see what operation is going to do first
 	if ( a == '('){
 		int ExpTemp = Exp();
-		return ExpTemp;
+		fin.get(a);
+		if(a == ')'){
+			return ExpTemp;
+		}
 	}
 
 	return (atoi(&a) );
