@@ -20,6 +20,10 @@ small program that will be able to deal not only with syntax errors but with sem
 using namespace std;
 // here are the function prototypes that we need expression, terminal, and factor
 int Exp(), Term(), Exp2(int), Term2(int), Fact(), Pwr();
+int Declarations(), Declaration(), Statements(), Statement(int);
+int input_st();
+int output_st();
+int assignment_st(int);
 
 // This declaration is for when we want to get data from the data file where our example operation is
 ifstream fin("myfile.txt");
@@ -28,7 +32,7 @@ int main(){
 		 
 	
 	if (fin.is_open())cout << "result = " << Exp() << endl;
-	else cout << "could not open file" <<endl;
+	else cout << " **Could Not Open File**" <<endl;
 	fin.close();
 
 
@@ -123,4 +127,39 @@ int Fact(){
 
 	return (atoi(&a) );
 	
+}
+
+int Declarations(){
+
+
+}
+
+int Declaration(){
+
+
+}
+
+int Statements(){
+
+
+}
+
+int Statement(int word){
+
+
+}
+
+int input_st(){
+
+
+}
+
+int output_st(){
+
+
+}
+
+int assignment_st(int word){
+
+
 }
