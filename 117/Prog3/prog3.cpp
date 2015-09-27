@@ -24,16 +24,34 @@ int Declarations(), Declaration(), Statements(), Statement(int);
 int input_st();
 int output_st();
 int assignment_st(int);
+void Programa1();
 
 // This declaration is for when we want to get data from the data file where our example operation is
-ifstream fin("myfile.txt");
+ifstream fin("myfile1.txt");
 
 int main(){
-		 
-	
-	if (fin.is_open())cout << "result = " << Exp() << endl;
-	else cout << " **Could Not Open File**" <<endl;
+	 ifstream fin("myfile1.txt");
+	 string word;
+
+	 /*
+	 -- made this liitle function to test that i can search 
+	 -- for words in different lines from a file 
+	 if (fin >> word)
+		if (word == "program")
+			Programa1();
 	fin.close();
+	*/
+	
+
+	if (fin >> word){
+		if (word == "Program"){
+			cout << Declarations();
+			cout << Statements();
+		}
+	}
+
+	
+	
 
 
 return(0);
@@ -131,7 +149,17 @@ int Fact(){
 
 int Declarations(){
 
-
+	int countword = 0;
+	string word;
+	if (fin >> word){
+		if (word == "begin"){
+			exit(1);
+		}
+		else if (word == "var"){
+			return Declaration();
+		}
+		return Declarations();
+	}
 }
 
 int Declaration(){
@@ -163,3 +191,27 @@ int assignment_st(int word){
 
 
 }
+
+/*
+--made this liitle function to test that i can search 
+--for words in different lines from a file 
+void Programa1(){
+
+	string word;
+
+	int countword = 0;
+	while (getline(fin, word)){
+		if (countword == 1){
+			if (word == "begin"){
+				cout << "this worked" << endl;
+			}
+			else if (word == "var")
+				cout << " this did not work" << endl;
+		}
+
+		countword = countword +1;
+	}
+}
+
+*/
+	
