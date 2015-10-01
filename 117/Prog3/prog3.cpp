@@ -18,39 +18,55 @@ small program that will be able to deal not only with syntax errors but with sem
 
 
 using namespace std;
+
+struct node
+{
+	char id; 
+	int value;
+};
+node symbol[20];
+
 // here are the function prototypes that we need expression, terminal, and factor
 int Exp(), Term(), Exp2(int), Term2(int), Fact(), Pwr();
-int Declarations(), Declaration(), Statements(), Statement(int);
-int input_st();
-int output_st();
-int assignment_st(int);
+int Statement(string);
+void Declarations(), Declaration(), input_st(), output_st(),assignment_st(char);
+int Statements();
 void Programa1();
+
+string letters = "abcdefghijklmnopqrstuvwxyz";
 
 // This declaration is for when we want to get data from the data file where our example operation is
 ifstream fin("myfile1.txt");
 
 int main(){
-	 ifstream fin("myfile1.txt");
+	 //ifstream fin("myfile1.txt");
 	 string word;
 
 	 /*
-	 -- made this liitle function to test that i can search 
-	 -- for words in different lines from a file 
+	// -- made this liitle function to test that i can search 
+	//-- for words in different lines from a file 
 	 if (fin >> word)
-		if (word == "program")
+		if (word == "program" || word == "Program")
 			Programa1();
 	fin.close();
 	*/
 	
-
 	if (fin >> word){
-		if (word == "Program"){
-			cout << Declarations();
-			cout << Statements();
+		if (word == "Program" || word == "program"){
+			Declarations();
+			Statements();
+
+			if (word == "end"){
+				cout << "Program is done" << endl;
+				return 0;
+			}
+
+		}
+		else{
+			cout << "Error (Lexical/Syntax) " << endl;
+			exit(1);
 		}
 	}
-
-	
 	
 
 
@@ -147,61 +163,184 @@ int Fact(){
 	
 }
 
-int Declarations(){
+void Declarations(){
 
 	int countword = 0;
 	string word;
-	if (fin >> word){
-		if (word == "begin"){
-			exit(1);
+/*
+	while (getline(fin, word)){
+		if (countword == 1 || countword == 2){
+			if (word == "begin"){
+				exit(1);
+			}
+			else if (word == "var"){
+				Declaration();
+			}
+			return Declarations();
 		}
-		else if (word == "var"){
-			return Declaration();
+	} 
+	*/
+		
+		while (fin >> word){
+			if (word == "begin")
+				exit(1);
+			else if (word == "var")
+				Declaration();
+			Declarations();
+
 		}
-		return Declarations();
-	}
+		
 }
 
-int Declaration(){
+void Declaration(){
+	char word;
+	//string word;
+	int countword = 0;
+	
 
+	while(getline(fin, letters)){
+		if (countword == 1 || countword == 2){
+			while(word != ';'){
+				for (int i = 0; i< letters.size(); i++){
+					if(word == letters[i])
+						symbol[i].id = word;
+				}
+			}
+		}
+	}
 
 }
 
 int Statements(){
+	int countword = 0;
+	string word;
+	/*
+	while (fin >> word){
+		if (word == "end")
+			exit(1);
+		else 
+			return Statement(word);
+		return Statements();
+	} */
+
+	while(getline (fin, word)){
+		if (countword == 11){
+			if (word == "end")
+				exit(1);
+			else 
+				return Statement(word);
+			
+		}
+		countword = countword +1;
+	} return Statements();
+
+}
+
+int Statement(string word){
+
+	int countword = 0;
+	while (getline (fin, word)){
+		if (countword == 4){
+			if (word == "input")
+				input_st();
+		}
+		if (countword == 6 || countword == 8 || countword == 9 || countword == 10){
+			if (word == "output")
+				output_st();
+		}
+		else{
+
+			for (int i = 0; i < word.size(); i++){
+				assignment_st(word[i]);
+			}
+		}
+	}
 
 
 }
 
-int Statement(int word){
+void input_st(){
+
+	char word;
+
+	while (fin >> word ){
+		for (int i = 0; i < 20; i++){
+			for (int j = 0; j < letters.size(); j++){
+				if (symbol[i].id == letters[i]){
+					if(symbol[i].id == word){
+						cin >> symbol[i].value;
+					}
+					else 
+						cout << "Semantic Error" << endl;
+				}
+				else
+					cout << "Syntax Error" << endl;
+
+			}
+		}
+	}
+
 
 
 }
 
-int input_st(){
+void output_st(){
+
+	char word;
+	while (fin >> word){
+		for (int i = 0; i < 20; i++){
+			for (int j = 0; j < letters.size(); j++){
+				if (symbol[i].id == letters[i]){
+					if (symbol[i].id == word)
+						cout << symbol[i].value << endl;
+					else 
+						cout << "Semantic Error" << endl;
+				}
+				else {
+					fin.putback(word);
+					cout << Exp() << endl;
+				}
+				
+			}
+		}
+
+	}
 
 
 }
 
-int output_st(){
+void assignment_st(char word){
 
-
-}
-
-int assignment_st(int word){
-
+	while (fin >> word){
+		if (word == '='){
+			int Temp = Exp();
+			for (int i = 0; i < 20; i++){
+				for (int j =0; j< letters.size(); j++){
+					if (symbol[i].id == letters[i]){
+						if (symbol[i].id == word)
+							symbol[i].value = Temp;
+						else 
+							cout << "Semantic Error" << endl;
+					}
+					else 
+						cout << "Syntax Error" << endl;
+				}
+			}
+		}
+	}
 
 }
 
 /*
---made this liitle function to test that i can search 
---for words in different lines from a file 
+//made this liitle function to test that i can search 
+//for words in different lines from a file 
 void Programa1(){
 
 	string word;
 
 	int countword = 0;
 	while (getline(fin, word)){
-		if (countword == 1){
+		if (countword == 2){
 			if (word == "begin"){
 				cout << "this worked" << endl;
 			}
@@ -212,6 +351,17 @@ void Programa1(){
 		countword = countword +1;
 	}
 }
+*/
+/*
+void Programa1(){
 
+	string word;
+	while(fin >> word){
+		if (word == "begin")
+			cout << "this worked"<< endl;
+		else if (word == "var")
+			cout << "didnt work" << endl;
+	}
+}
 */
 	
