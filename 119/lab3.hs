@@ -33,14 +33,16 @@ match_correct r s = case match r s of
     match (Cat r1 r2) s = if and [((match_correct r1 s1) && (match_correct r2 s2)) | (s1,s2) <- (splits s)]
                           then (Just "")
                           else (Nothing)
-
-    match (Union r1 r2) s = if or[((match r1 s1 == Just "") || (match r2 s2 == Just "")) | (s1,s2) <- (splits s)]
+                            
+    match (Union r1 r2) s = if ((match r1 s == Just "") || (match r2 s == Just ""))
                             then (Just "")
-                            else (Nothing)
-    match (Star r) s = undefined
+                            else Nothing
+                            
+    match (Star r) s = Just "" -- Honestly I don't know how to do this. I didnt leave undefined so i could run the example.
+      {-if [(match r s1 == Just "") | s1 <- (splits s)]
+                        then (Just "")
+                        else False -}
     match _ _ = Nothing
-  --  match r s = undefined
-
 
 
 -- Problem 2: Choose one of the other four matching algorithms:
@@ -60,7 +62,18 @@ match_prefixes r s = case match r s of
 
   where
     match :: RE -> String -> Maybe String
-    match r s = undefined
+    match Empty "" = Nothing
+    match (Letter a) (s:ss) = if (a == s)
+                              then (Just "")
+                              else Nothing
+    match (Union r1 r2) s = if ( (match r1 s == Just "") || (match r2 s == Just ""))
+                            then Nothing
+                            else Just ""
+    match (Cat r1 r2) s = if and [((match_correct r1 s1) && (match_correct r2 s2)) | (s1,s2) <- (splits s)]
+                          then Nothing
+                          else Just ""
+   -- match (Star r) s = undefined
+    match _ _ = Nothing
 
 
 -- The continuation-based matcher works by matching a prefix of the string 
