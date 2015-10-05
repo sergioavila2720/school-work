@@ -34,7 +34,7 @@ distinct = dedup . sort
         dedup (x1:x2:xs) | x1 == x2   = dedup (x2:xs)
                          | otherwise   = x1 : dedup (x2:xs)
 
-within:: Ord a => a -> [a] -> Bool
+within:: (Eq a) => a -> [a] -> Bool
 within x [] = False
 within x (a:as) = if (x == a)
 				  then True
@@ -71,18 +71,19 @@ checkFSM sigma (q, q0, f, ds) = (unique q) && (within q0 q) && (and[within x q |
 -- dlt implements the delta function of M: given state q and input symbol a, 
 -- it returns the new state q'.
 dlt :: (Eq a) => FSM a -> a -> Char -> a
-dlt fsm q a = undefined
+dlt fsm q a = head(lookupAll (q,a) (delta fsm) )
 
 -- deltaStar M q s
 -- deltaStar implements the delta* function, which returns the state the machine
 -- will be in after processing an entire string. 
 deltaStar :: (Eq a) => FSM a -> a -> String -> a
-deltaStar fsm q s = undefined
+deltaStar fsm q [] = q
+deltaStar fsm q (l:ls) = deltaStar fsm (dlt fsm q l) ls
 
 -- accept1 M s
 -- accept1 defines string acceptance using deltaStar.
 accept1 :: (Eq a) => FSM a -> String -> Bool
-accept1 fsm s = undefined
+accept1 fsm@(_,q0,f,_) s = (within (deltaStar fsm q0 s) f )
 
 -- accept2 M s
 -- accept2 defines string acceptance using the Lq(M) construct: starting the
@@ -91,7 +92,8 @@ accept2 :: (Eq a) => FSM a -> String -> Bool
 accept2 fsm@(qs,st,_,_) s = accept_q fsm st s
   where
     accept_q :: (Eq a) => FSM a -> a -> String -> Bool
-    accept_q fsm q s = undefined
+    accept_q fsm q (l:ls) = accept_q fsm (dlt fsm q l) ls
+    accept_q (_,_,f,_) q [] = within q f
 
 ----------------------------------- Part 2 -------------------------------------
 
@@ -108,13 +110,45 @@ accept2 fsm@(qs,st,_,_) s = accept_q fsm st s
 -- Use Ints for your states.
 
 machine_ab_star :: FSM Int
-machine_ab_star = ([undefined],  -- List of states
+machine_ab_star = ([0,1,-1],
+                    0,
+                    [0],
+                    [(0,'a',1),
+                    (1,'b',0),
+                    (0,'b',-1),
+                    (1,'a',-1),
+                    (-1,'a',-1),
+                    (-1,'b',-1)] )
+{-machine_ab_star = ([undefined],  -- List of states
                    undefined,    -- Start state
                    [undefined],  -- list of final states
                    [(undefined,undefined,undefined)]) -- delta function
+-}
 
 machine_ab_plus :: FSM Int
-machine_ab_plus = undefined
+machine_ab_plus = ([0,1,2,3,-1],
+                    0,
+                    [0,2],
+                    [(0,'a',1),
+                    (0,'b',-1),
+                    (1,'a',-1),
+                    (1,'b',2),
+                    (2,'a',3),
+                    (2,'b',-1),
+                    (3,'a',-1),
+                    (3,'b',2),
+                    (-1,'a',-1),
+                    (-1,'b',-1)])
+
+
 
 machine_div_3 :: FSM Int
-machine_div_3 = undefined
+machine_div_3 = ([0,1,2],
+                  0,
+                  [0],
+                  [(0,'0',0),
+                  (0,'1',1),
+                  (1,'1',0),
+                  (1,'0',2),
+                  (2,'1',2),
+                  (2,'0',1)])
