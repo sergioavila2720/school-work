@@ -36,25 +36,44 @@ delta (_,_,_,ds) = ds
 -- converts a regular expression to a finite state machine.
 --
 -- 
+-- 0 is your list of states 
+-- q0 your starting state
+-- F is your final states
+lookupAll :: (Eq a) => (a,Char) -> [(a,Char,a)] -> [a]
+lookupAll (q,a) dlt = [s2 | (s1,c,s2) <- dlt, q == s1, c == a]
+
+dlt :: (Eq a) => FSM a -> a -> Char -> a
+dlt fsm q a = head(lookupAll (q,a) (delta fsm) )
+
 
 -- Construct the Empty machine, the machine that accepts no strings.
 m_empty :: FSM Int
-m_empty = undefined
+m_empty = ([0],0,[],[(0,c,0) | c <- sigma])
 
 -- Construct the Symbol machine, the machine that accepts strings consisting
 -- of the single character c.
 m_symbol :: Char -> FSM Int
-m_symbol c = undefined
+m_symbol c = ([0,1,-1],0,[1], [(0,c,1)]++[(0,a,-1) | a <- sigma, c/= a]++[(1,a,-1) | a<- sigma]++[(-1,a,-1) | a <- sigma])
 
 -- Construct the Union machine, the machine that accepts strings in the union
 -- of L(m1) and L(m2)
-m_union :: (Eq a, Eq b) => FSM a -> FSM b -> FSM (a,b)
-m_union m1 m2 = undefined
+m_union :: (Eq a, Eq b) => FSM a -> FSM b -> FSM (a,b) 
+m_union m1@(q1,s1,f1,d1) m2@(q2,s2,f2,d2) = (_Q,_q0,_f,_dlt)
+    where
+      _Q = [(qa,qb)  | qa <- q1, qb <- q2 ]
+      _q0 = (s1,s2)
+      _f = [(qa, qb) | qa <- q1, qb <- q2, ((qa `elem` f1) || (qb `elem` f2)) ]
+      _dlt = [( (qa,qb) , a, ((dlt m1 qa a), (dlt m2 qb a)) )| a <- sigma, qa <- q1, qb <- q2]
 
 -- Construct the Cat machine, the machine that accepts strings in the 
 -- concatenation of L(m1) and L(m2).
 m_cat :: (Eq a, Eq b) => FSM a -> FSM b -> FSM (a,[b])
-m_cat m1 m2 = undefined
+m_cat m1@(q1,s1,f1,d1) m2@(q2,s2,f2,d2) = (_Q,_q0,_f,_dlt) 
+    where
+      _Q =  undefined --[(qa, x2) | qa <- q1, x2 <-  ]
+      _q0 = undefined
+      _f = undefined
+      _dlt = undefined
 
 -- Construct the Star machine, the machine that accepts strings in the 
 -- Kleene start of L(m).
@@ -238,3 +257,6 @@ reparse s = let Just ("",result) = plus $ filter (/=' ') s in result
     build cons ((Just (ss,re)):rs) = let (Just (ss',re')) = build cons rs
                                      in
                                        Just (ss', cons re re')
+
+
+-- allen_mills@mail.fresnostate.edu
