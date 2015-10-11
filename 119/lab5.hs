@@ -45,6 +45,14 @@ lookupAll (q,a) dlt = [s2 | (s1,c,s2) <- dlt, q == s1, c == a]
 dlt :: (Eq a) => FSM a -> a -> Char -> a
 dlt fsm q a = head(lookupAll (q,a) (delta fsm) )
 
+distinct :: Ord a => [a] -> [a]
+distinct = dedup . sort
+    where
+        dedup [] = []
+        dedup [x] = [x]
+        dedup (x1:x2:xs) | x1 == x2   = dedup (x2:xs)
+                         | otherwise   = x1 : dedup (x2:xs)
+
 
 -- Construct the Empty machine, the machine that accepts no strings.
 m_empty :: FSM Int
@@ -67,13 +75,19 @@ m_union m1@(q1,s1,f1,d1) m2@(q2,s2,f2,d2) = (_Q,_q0,_f,_dlt)
 
 -- Construct the Cat machine, the machine that accepts strings in the 
 -- concatenation of L(m1) and L(m2).
+correction :: (Eq a, Eq b) => (a,[b]) -> [a] -> b -> (a,[b])
+correction (q,x) f1 q0 = if (q `elem` f1)
+                         then (q, x ++ [q0])
+                         else (q,x)
+
+
 m_cat :: (Eq a, Eq b) => FSM a -> FSM b -> FSM (a,[b])
 m_cat m1@(q1,s1,f1,d1) m2@(q2,s2,f2,d2) = (_Q,_q0,_f,_dlt) 
     where
-      _Q =  undefined --[(qa, x2) | qa <- q1, x2 <-  ]
-      _q0 = undefined
-      _f = undefined
-      _dlt = undefined
+      _Q = [ correction (qa, x2) f1 _q0 | qa <- q1, x2 <- subsequences(q2)]
+      _q0 = correction (_q0,[]) f1 _q0
+      _f = [(q,x) | (q,x) <- _Q, (x `intersect` f2) /= []]
+      _dlt = [( ql,c, ((dlt m1 q c), ([dlt m2 _X c | _X <- x]) ) ) | c <- sigma, ql@(q,x) <- _Q]
 
 -- Construct the Star machine, the machine that accepts strings in the 
 -- Kleene start of L(m).
@@ -257,6 +271,3 @@ reparse s = let Just ("",result) = plus $ filter (/=' ') s in result
     build cons ((Just (ss,re)):rs) = let (Just (ss',re')) = build cons rs
                                      in
                                        Just (ss', cons re re')
-
-
--- allen_mills@mail.fresnostate.edu
