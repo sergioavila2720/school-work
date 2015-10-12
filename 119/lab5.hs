@@ -80,19 +80,30 @@ correction (q,x) f1 q0 = if (q `elem` f1)
                          then (q, x ++ [q0])
                          else (q,x)
 
-
+{-
 m_cat :: (Eq a, Eq b) => FSM a -> FSM b -> FSM (a,[b])
 m_cat m1@(q1,s1,f1,d1) m2@(q2,s2,f2,d2) = (_Q,_q0,_f,_dlt) 
     where
       _Q = [ correction (qa, x2) f1 _q0 | qa <- q1, x2 <- subsequences(q2)]
       _q0 = correction (_q0,[]) f1 _q0
       _f = [(q,x) | (q,x) <- _Q, (x `intersect` f2) /= []]
-      _dlt = [( ql,c, ((dlt m1 q c), ([dlt m2 _X c | _X <- x]) ) ) | c <- sigma, ql@(q,x) <- _Q]
-
+      _dlt = [( ql,c, correction((dlt m1 q c), ([(dlt m2 _X c) | _X <- x]) ) f1 s2 ) | c <- sigma, ql@(q,x) <- _Q]
+-}
 -- Construct the Star machine, the machine that accepts strings in the 
 -- Kleene start of L(m).
+
+correction_star :: Eq a => [a]
+correction_star x f q0 = if( (x `intersect` f ) /= [] )
+                         then (x ++ [q0])
+                         else (x)
+
 m_star :: Eq a => FSM a -> FSM [a]
-m_star m = undefined
+m_star m@(q,s,f,d) = (_Q,_q0,_f,_dlt)
+    where
+      _Q = [correction_star (x) f _q0 | x <- subsequences(q)]
+      _q0 = []
+      _f = [] ++ [x | x <- _Q, (x `intersect` f) /= [] ]
+      _dlt = --[(l,c,r)] 
 
 -- Using the above, write the function re_to_fsm that converts a RE into a
 -- FSM that accepts the same language.
