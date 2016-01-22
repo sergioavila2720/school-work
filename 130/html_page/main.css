@@ -11,3 +11,26 @@ body{
     margin: auto;
 
 }
+
+#header_color1{
+	color: #0074e5;
+}
+
+#header_color2{
+	color: #ff0404;
+}
+
+#header_color3{
+	color: #f2b818;
+}
+
+#header_color4{
+	color: #046f2f;
+}
+
+img {
+    display: block;
+    margin: auto;
+    border-radius: 50%;
+    border: 15px ridge gold;
+}
