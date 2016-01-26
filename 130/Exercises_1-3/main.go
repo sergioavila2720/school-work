@@ -3,5 +3,6 @@ package main
 import "fmt"
 
 func main() {
-    fmt.Printf("Hello World\n")
+	myName := "Sergio Avila"
+    fmt.Printf("Hello, my name is " + myName + "\n")
 }
