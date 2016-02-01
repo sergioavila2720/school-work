@@ -19,7 +19,7 @@ func main() {
 
 	http.HandleFunc("/", surf)
 	http.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets"))))
-	http.Handle("/cssss/", http.StripPrefix("/css", http.FileServer(http.Dir("./css"))))
+	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("./css"))))
 
-	http.ListenAndServe(":8090", nil)
+	http.ListenAndServe(":8020", nil)
 }
