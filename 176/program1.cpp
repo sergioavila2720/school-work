@@ -14,8 +14,8 @@ using namespace std;
 { struct timeval t; gettimeofday(&t, NULL);\
   now = t.tv_sec + t.tv_usec/1000000.0; }
 
-long unsigned int fibo_R(int n); // had to make these two long ints to be able to handle N= 47
-long unsigned int fibo_I(int n); // even then it does not give me the right answer at 47
+long int fibo_R(long int n); // had to make these two long ints to be able to handle N= 47 and more 
+long int fibo_I(int n); 
 
 int main(){
 
@@ -29,7 +29,7 @@ int main(){
 
 
 	pipe(p1); pipe(p2); pipe(p3); pipe(p4); // initializing 4 pipes
-	cout << "\nFibonacci number at " << Response << " is = " << fibo_I(Response) << "\n\n";
+	cout << "\nFibonacci number at " << Response << " is = " << fibo_R(Response) << "\n\n";
 	for (int i =1; i <=3; i++){
 		pid = fork();
 		if (pid == 0 && i == 1){
@@ -72,7 +72,7 @@ int main(){
 	return 0;
 }
 // Fibonacci function using recursion
-long unsigned int fibo_R(int n){
+long int fibo_R(long int n){
 	if (n == 1 || n == 2)
 		return 1;
 	else
@@ -80,9 +80,9 @@ long unsigned int fibo_R(int n){
 }
 
 // Fibonacci function using Iteration
-long unsigned int fibo_I(int n){
-	int prev, curr, next;
-	prev = 1; curr = 1; next;
+long int fibo_I(int n){
+	long int prev, curr, next; // had to make these long ints to be able to handle N= 47 and more 
+	prev = 1; curr = 1;
 	if (n ==1 || n == 2){
 			return 1;
 	}
