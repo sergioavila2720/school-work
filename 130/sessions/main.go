@@ -3,8 +3,6 @@ package main
 
 import (
 	"net/http"
-	//"github.com/nu7hatch/gouuid"
-	//"log"
 	"github.com/nu7hatch/gouuid"
 )
 func session(res http.ResponseWriter, req *http.Request){
