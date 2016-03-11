@@ -1,0 +1,25 @@
+package main
+
+
+import (
+	"os"
+	"io"
+	"path/filepath"
+	"net/http"
+	"html/template"
+	"log"
+)
+func fileP(res http.ResponseWriter, req *http.Request){
+	tpl, err := template.ParseFiles("index.gohtml")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	tpl.Execute(res, nil)
+
+	if req.Method == "POST" {
+		file, _, err := req.FormFile("n")
+		if err != nil {
+			http.Error(res, err.Error(), 500)
+			return
+		}
+		defer f
