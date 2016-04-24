@@ -1,0 +1,2 @@
+cookies do not use double quotation marks
+the JSON is not stored correctly
