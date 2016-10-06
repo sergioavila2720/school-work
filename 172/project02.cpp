@@ -5,6 +5,11 @@ Csci: 172
 
 Compile: g++ project02.cpp -o run2 -lGL -lGLU -lglut
 run:     ./run2
+
+In this program we will create two three objects; a teapot, a cube and a sphere.
+we will make use of the glut library and some functions to create those objects. 
+As specified in the prompt we have x, y, z values to put them in the window. we will be able 
+to zoom in and out specific objects and rotate them as well. 
 */
 
 
@@ -37,6 +42,21 @@ const GLfloat high_shininess[] = { 100.0f };
 
 /* GLUT callback Handlers */
 
+/*Made these variables global because I'm going to need
+  them for zooming in and out and rotate the values of the objects*/
+GLdouble T_trans = 2.0;
+GLdouble C_trans = -3.0;
+GLdouble S_trans = -1.0;
+GLdouble T_rotate = 0.0;
+GLdouble C_rotate = 0.0;
+GLdouble S_rotate = 0.0;
+
+/*need these flags to be able to combine keys and special keys*/
+bool T_flag = false;
+bool C_flag = false;
+bool S_flag = false;
+
+
 static void resize(int width, int height)
 {
      double Ratio;
@@ -59,6 +79,8 @@ static void resize(int width, int height)
 
 static void display(void)
 {
+
+    double yRotationAngle;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -72,29 +94,101 @@ static void display(void)
 
     // your code here
 
+    // random colors for the objects
+    glPushMatrix();
+    glTranslatef(0.0, 0.0, T_trans);
+    glRotatef(T_rotate, 0.0, 5.0, 0.0);
+    glColor3f(1.0, 0.0, 0.0);
+    glutSolidTeapot(1.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(4.0, 0.0, C_trans);
+    glRotatef (C_rotate, 0.0, 5.0, 0.0);
+    glColor3f(0.0, 1.0, 0.0);
+    glutSolidCube(3.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-3.5, 0.0, S_trans);
+    glRotatef (S_rotate, 0.0, 5.0, 0.0);
+    glColor3f(0.0, 0.0, 0.804);
+    glutSolidSphere(1.3, 24, 24);
+    glPopMatrix();
     glutSwapBuffers();
 }
 
+// function for regular key detection
 static void key(unsigned char key, int x, int y)
-{
+{  
+
+
     switch (key)
     {
         case 27 :
         case 'q':
             exit(0);
             break;
+
+        case 't':
+            T_flag = true;
+            C_flag = false;
+            S_flag = false;
+            break;
+
+        case 'c':
+            C_flag = true;
+            T_flag = false;
+            S_flag = false;
+            break;
+
+        case 's':
+            S_flag = true;
+            T_flag = false;
+            C_flag = false;
+            break;
     }
+    
 }
 
+// function for special key detection
 void Specialkeys(int key, int x, int y)
 {
+    
     switch(key)
     {
-    case GLUT_KEY_UP:
-    break;
-   }
+        case GLUT_KEY_UP:
+            if (T_flag) T_trans += 0.5; 
+            else if(C_flag) C_trans += 0.5; 
+            else if(S_flag) S_trans += 0.5; 
+            break;
+    
+
+        case GLUT_KEY_DOWN:
+            if (T_flag) T_trans -= 0.5; 
+            else if(C_flag) C_trans -= 0.5; 
+            else if(S_flag) S_trans -= 0.5; 
+            break;
+
+
+        case GLUT_KEY_LEFT:
+            if (T_flag) T_rotate += 5.0; 
+            else if(C_flag) C_rotate += 5.0; 
+            else if(S_flag) S_rotate += 5.0; 
+            break;
+        
+
+        case GLUT_KEY_RIGHT:
+            if (T_flag) T_rotate -= 5.0; 
+            else if(C_flag) C_rotate -= 5.0; 
+            else if(S_flag) S_rotate -= 5.0; 
+            break;
+        
+    }     
+   
   glutPostRedisplay();
 }
+
 
 static void idle(void)
 {
